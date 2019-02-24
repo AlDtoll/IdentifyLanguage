@@ -12,11 +12,12 @@ import com.example.identifylanguage.R;
 import com.example.identifylanguage.model.Note;
 import com.example.identifylanguage.presenter.Presenter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static com.example.identifylanguage.presenter.Presenter.PRESENTER;
 
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements Serializable {
 
     Presenter presenter;
 
