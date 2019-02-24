@@ -1,15 +1,15 @@
-package com.example.identifylanguage;
+package com.example.identifylanguage.task;
 
 import android.os.AsyncTask;
 
 import com.example.identifylanguage.model.Language;
 import com.example.identifylanguage.model.Languages;
 import com.example.identifylanguage.network.LanguagesApi;
+import com.example.identifylanguage.network.MyRetrofit;
 import com.example.identifylanguage.presenter.Presenter;
 
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Credentials;
 import retrofit2.Call;
@@ -18,7 +18,6 @@ import retrofit2.Response;
 
 public class IdentityTask extends AsyncTask<String, Void, String> {
 
-    private static final String BASE_URL = "https://gateway.watsonplatform.net/language-translator/api/";
     private static final String USERNAME = "6987a48d-342e-4a69-8adc-e65b1cc0b9da";
     private static final String PASSWORD = "MxYSIi6nQP2Y";
 
@@ -30,23 +29,8 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
-        LanguagesApi languagesApi = presenter.getApi();
+        LanguagesApi languagesApi = MyRetrofit.languagesApi;
         String credentials = Credentials.basic(USERNAME, PASSWORD);
-        //todo прикрутить rxJava
-//        Single<List<Language>> languages = languagesApi.languages(credentials, "text/plain", charSequence.toString());
-//        languages.subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new DisposableSingleObserver<List<Language>>() {
-//                    @Override
-//                    public void onSuccess(@NonNull List<Language> messages) {
-//                        Log.d(TAG, "onSuccess " + messages.size());
-//                    }
-//
-//                    @Override
-//                    public void onError(@NonNull Throwable e) {
-//                        Log.d(TAG, "onError " + e);
-//                    }
-//                });
 
         Call<Languages> languages = languagesApi.languages(credentials, "text/plain", presenter.getText());
         languages.enqueue(new Callback<Languages>() {
@@ -58,14 +42,9 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
             @Override
             public void onFailure(Call<Languages> call, Throwable t) {
                 presenter.setResultOfIdentification("Произошла ошибка");
+                presenter.showResultOfIdentification();
             }
         });
-        try {
-            //todo пффффф.
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         return "success";
     }
 
@@ -81,10 +60,6 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
         } else {
             presenter.setResultOfIdentification("Не удалось распознать текст");
         }
-    }
-
-    @Override
-    protected void onPostExecute(String content) {
         presenter.showResultOfIdentification();
     }
 }

@@ -9,12 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.example.identifylanguage.presenter.Presenter;
 import com.example.identifylanguage.R;
+import com.example.identifylanguage.presenter.Presenter;
+
+import java.io.Serializable;
 
 import static com.example.identifylanguage.presenter.Presenter.PRESENTER;
 
-public class NewTextFragment extends Fragment {
+public class NewTextFragment extends Fragment implements Serializable {
 
     Presenter presenter;
 
