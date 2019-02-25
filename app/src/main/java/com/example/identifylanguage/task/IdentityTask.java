@@ -2,6 +2,7 @@ package com.example.identifylanguage.task;
 
 import android.os.AsyncTask;
 
+import com.example.identifylanguage.common.ConstantEnum;
 import com.example.identifylanguage.model.Language;
 import com.example.identifylanguage.model.Languages;
 import com.example.identifylanguage.network.LanguagesApi;
@@ -12,15 +13,18 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import okhttp3.Credentials;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Фоновая адача, запускаемая для идентификации введенного текста
+ */
 public class IdentityTask extends AsyncTask<String, Void, String> {
 
-    private static final String USERNAME = "6987a48d-342e-4a69-8adc-e65b1cc0b9da";
-    private static final String PASSWORD = "MxYSIi6nQP2Y";
-
+    private static final double threshold = 80;
     private Presenter presenter;
 
     public IdentityTask(Presenter presenter) {
@@ -30,9 +34,9 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... strings) {
         LanguagesApi languagesApi = MyRetrofit.languagesApi;
-        String credentials = Credentials.basic(USERNAME, PASSWORD);
-
-        Call<Languages> languages = languagesApi.languages(credentials, "text/plain", presenter.getText());
+        String credentials = Credentials.basic(ConstantEnum.USERNAME.getCode(), ConstantEnum.PASSWORD.getCode());
+        RequestBody text = RequestBody.create(MediaType.parse("text/plain"), presenter.getText());
+        Call<Languages> languages = languagesApi.identify(credentials, "text/plain", text);
         languages.enqueue(new Callback<Languages>() {
             @Override
             public void onResponse(Call<Languages> call, Response<Languages> response) {
@@ -51,15 +55,23 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
     private void analyzeResponse(Response<Languages> response) {
         if (response.isSuccessful()) {
             List<Language> languages = response.body().getLanguages();
-            Language language = languages.get(0);
-            String probability = new DecimalFormat("#0.00 %").format(language.getConfidence());
-            //todo ответ по прикольнее
-            String resultOfIdentification = "Это " + language.getLanguage() + ". С вероятностью " + probability;
-            presenter.setResultOfIdentification(resultOfIdentification);
+            presenter.setResultOfIdentification(createResultOfIdentification(languages));
             presenter.makeNote();
         } else {
             presenter.setResultOfIdentification("Не удалось распознать текст");
         }
         presenter.showResultOfIdentification();
+    }
+
+    private String createResultOfIdentification(List<Language> languages) {
+        Language language = languages.get(0);
+        String languageFullName = presenter.getFullName(language.getLanguage());
+        String probability = new DecimalFormat("#0.00 %").format(language.getConfidence());
+        if (language.getConfidence() > threshold) {
+            return "Это определенно " + languageFullName + ". С вероятностью " + probability;
+        }
+        String secondLanguageFullName = presenter.getFullName(languages.get(1).getLanguage());
+        String secondProbability = new DecimalFormat("#0.00 %").format(languages.get(1).getConfidence());
+        return "Вероятность того, что это " + languageFullName + " " + probability + ". Так же возможно, что это " + secondLanguageFullName + " (" + secondProbability + ")";
     }
 }

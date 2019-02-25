@@ -8,7 +8,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -17,14 +16,10 @@ import com.example.identifylanguage.presenter.Presenter;
 
 import java.io.Serializable;
 
-import static com.example.identifylanguage.presenter.Presenter.PRESENTER;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, Serializable {
 
     Presenter presenter;
-
-    final String LOG_TAG = "myLogs";
 
     @Override
     public void onBackPressed() {
@@ -68,7 +63,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(LOG_TAG, "MainActivity onCreate");
         setContentView(R.layout.activity_main);
         presenter = new Presenter(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -92,43 +86,11 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         presenter.onStart();
-        Log.d(LOG_TAG, "MainActivity onStart");
-    }
-
-    protected void onResume() {
-        super.onResume();
-        Log.d(LOG_TAG, "MainActivity onResume");
-    }
-
-    protected void onPause() {
-        super.onPause();
-        Log.d(LOG_TAG, "MainActivity onPause");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         presenter.onStop();
-        Log.d(LOG_TAG, "MainActivity onStop");
-    }
-
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(LOG_TAG, "MainActivity onDestroy");
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable(PRESENTER, presenter);
-        Log.d(LOG_TAG, "onSaveInstanceState");
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-//        Presenter presenter = (Presenter) savedInstanceState.getSerializable(PRESENTER);
-//        this.presenter.setText(presenter.getText());
-        Log.d(LOG_TAG, "onRestoreInstanceState");
     }
 }

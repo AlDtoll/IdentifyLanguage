@@ -1,11 +1,9 @@
 package com.example.identifylanguage.presenter;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,20 +11,26 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.example.identifylanguage.R;
+import com.example.identifylanguage.common.ConstantEnum;
 import com.example.identifylanguage.database.DataBase;
 import com.example.identifylanguage.model.Note;
+import com.example.identifylanguage.task.GetIdentifiableLanguagesTask;
 import com.example.identifylanguage.task.IdentityTask;
 import com.example.identifylanguage.view.HistoryFragment;
+import com.example.identifylanguage.view.MainActivity;
 import com.example.identifylanguage.view.NewTextFragment;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Босс, который рулит всем процессом
+ */
 public class Presenter implements Serializable {
 
-    public static final String PRESENTER = "presenter";
-
-    private Activity activity;
+    private MainActivity activity;
     private NewTextFragment newTextFragment;
     private HistoryFragment historyFragment;
     private ProgressDialog progressDialog;
@@ -34,25 +38,27 @@ public class Presenter implements Serializable {
     private boolean isActive = true;
     private String text;
     private String resultOfIdentification = "пока не известен";
+    private Map<String, String> map = new HashMap<>();
 
-    public Presenter(Activity activity) {
+    public Presenter(MainActivity activity) {
         attachView(activity);
+        new GetIdentifiableLanguagesTask(this).execute();
     }
 
-    private void attachView(Activity activity) {
+    private void attachView(MainActivity activity) {
         this.activity = activity;
     }
 
     public void onStart() {
         createFragments();
+        //todo должен быть тот, который был при выходе
         showFragment(newTextFragment);
         isActive = true;
     }
 
-
-    public void createFragments() {
+    private void createFragments() {
         Bundle bundle = new Bundle();
-        bundle.putSerializable(PRESENTER, this);
+        bundle.putSerializable(ConstantEnum.PRESENTER.getCode(), this);
         newTextFragment = new NewTextFragment();
         newTextFragment.setArguments(bundle);
         historyFragment = new HistoryFragment();
@@ -104,28 +110,33 @@ public class Presenter implements Serializable {
 
         showFragment(fragment);
         item.setChecked(true);
+        //todo починить заголовок
         activity.setTitle(item.getTitle());
 
         DrawerLayout drawer = activity.findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    public void showFragment(Fragment fragment) {
-        FragmentManager fragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
+    private void showFragment(Fragment fragment) {
+        FragmentManager fragmentManager = activity.getSupportFragmentManager();
         fragmentManager.popBackStack();
         fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
     }
 
     public void onTextChanged(CharSequence charSequence) {
-        //todo убрать кавычки
         text = charSequence.toString();
     }
 
-
+    /**
+     * @return записи о результатах определения
+     */
     public ArrayList<Note> getNotes() {
         return DataBase.loadNotes(activity);
     }
 
+    /**
+     * Если результат распознования был успешным, но делаем запись
+     */
     public void makeNote() {
         DataBase.makeNote(activity, text, resultOfIdentification);
     }
@@ -147,5 +158,25 @@ public class Presenter implements Serializable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+
+    /**
+     * @param code код языка
+     * @return полное название языка, либо его код, если не удалось определить полное имя
+     */
+    public String getFullName(String code) {
+        //todo перевод
+        if (map.containsKey(code)) {
+            return map.get(code);
+        }
+        return code;
+    }
+
+    /**
+     * @param map мапа, полученная из списка код языка - полное название
+     */
+    public void setMap(Map<String, String> map) {
+        this.map = map;
     }
 }

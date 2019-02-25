@@ -10,12 +10,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.example.identifylanguage.R;
+import com.example.identifylanguage.common.ConstantEnum;
 import com.example.identifylanguage.presenter.Presenter;
 
 import java.io.Serializable;
 
-import static com.example.identifylanguage.presenter.Presenter.PRESENTER;
-
+/**
+ * Фрагмент для отображения экрана, позволяющего ввести текст для определения языка
+ */
 public class NewTextFragment extends Fragment implements Serializable {
 
     Presenter presenter;
@@ -23,7 +25,7 @@ public class NewTextFragment extends Fragment implements Serializable {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        presenter = (Presenter) getArguments().getSerializable(PRESENTER);
+        presenter = (Presenter) getArguments().getSerializable(ConstantEnum.PRESENTER.getCode());
         View fragment = inflater.inflate(R.layout.fragment_newtext, container, false);
         EditText editText = fragment.findViewById(R.id.editText);
         editText.addTextChangedListener(new TextWatcher() {
