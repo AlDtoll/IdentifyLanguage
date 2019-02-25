@@ -1,5 +1,9 @@
 package com.example.identifylanguage.model;
 
+/**
+ * Запись, которая нужна для сохранения результата в "истории".
+ * Содержит в себе текст и результат индетификации
+ */
 public class Note {
     private String text;
     private String resultOfIdentification;

@@ -9,14 +9,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.identifylanguage.R;
+import com.example.identifylanguage.common.ConstantEnum;
 import com.example.identifylanguage.model.Note;
 import com.example.identifylanguage.presenter.Presenter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import static com.example.identifylanguage.presenter.Presenter.PRESENTER;
-
+/**
+ * Фрагмент для отображения экрана истории, на котором показываются предыдущие тексты и результат их индетификации
+ */
 public class HistoryFragment extends Fragment implements Serializable {
 
     Presenter presenter;
@@ -24,7 +26,7 @@ public class HistoryFragment extends Fragment implements Serializable {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        presenter = (Presenter) getArguments().getSerializable(PRESENTER);
+        presenter = (Presenter) getArguments().getSerializable(ConstantEnum.PRESENTER.getCode());
         View fragment = inflater.inflate(R.layout.fragment_history, container, false);
         ArrayList<Note> notes = presenter.getNotes();
         LinearLayout list = fragment.findViewById(R.id.history_recycler_view);
