@@ -35,7 +35,7 @@ public class IdentityTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... strings) {
         LanguagesApi languagesApi = MyRetrofit.languagesApi;
         String credentials = Credentials.basic(ConstantEnum.USERNAME.getCode(), ConstantEnum.PASSWORD.getCode());
-        RequestBody text = RequestBody.create(MediaType.parse("text/plain"), presenter.getText());
+        RequestBody text = RequestBody.create(MediaType.parse("text/plain"), presenter.getText() != null ? presenter.getText() : "");
         Call<Languages> languages = languagesApi.identify(credentials, "text/plain", text);
         languages.enqueue(new Callback<Languages>() {
             @Override
